@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Film Development Time Calculator</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+        }
+        .form-input {
+            margin-bottom: 20px;
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Film Development Time Calculator</h2>
+        <div class="form-input">
+            <label for="uses">Enter the number of times you've used the liquid (1-24):</label>
+            <input type="number" id="uses" name="uses" min="1" max="24">
+        </div>
+        <button onclick="calculateDevelopmentTime()">Calculate</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function calculateDevelopmentTime() {
+            const uses = document.getElementById('uses').value;
+            fetch('http://127.0.0.1:5000/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ uses: uses }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('result').innerHTML = `<p style="color: red;">${data.error}</p>`;
+                } else {
+                    document.getElementById('result').innerHTML = `
+		    <p>Developing time: ${data.developing_time_formatted} (${data.developing_time_seconds})</p>
+                    <p>Fixing time: ${data.fixing_time_formatted} (${data.fixing_time_seconds})</p>
+                `;
+                    if (data.warning) {
+                        document.getElementById('result').innerHTML += `<p style="color: orange;">${data.warning}</p>`;
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `<p style="color: red;">An error occurred while calculating.</p>`;
+            });
+        }
+    </script>
+</body>
+</html>
+

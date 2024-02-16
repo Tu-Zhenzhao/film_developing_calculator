@@ -1,9 +1,16 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file, send_file
 from film_time import calculate_film_development_time
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
+
+
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
+
+
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
